@@ -1,0 +1,14 @@
+.env
+.env.*
+__pycache__/
+*.pyc
+.claude/
+venv/
+.venv/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+TASK.md
+LOG.md
+design_handoff_data_audit_redesign/
