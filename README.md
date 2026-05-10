@@ -23,6 +23,10 @@ The GIF below shows the local Streamlit flow: upload data, run checks, review th
 
 ![AuditIQ demo](assets/demo.gif)
 
+## Expected Output
+
+View a sample generated report: [Titanic PDF report](assets/sample-titanic-report.pdf).
+
 ## Quick Start
 
 ```bash

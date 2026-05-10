@@ -10,3 +10,5 @@ All notable changes to AuditIQ will be documented here.
 - Added PDF report generation.
 - Added optional Gemini-generated narrative with deterministic fallback.
 - Added sample Titanic dataset and unit tests.
+- Added sample Titanic PDF report for repository visitors.
+
