@@ -74,7 +74,10 @@ def quality_score(check_results: list[dict], total_rows: int) -> int:
         sev    = r.get("severity") or CHECK_SEVERITY.get(r.get("check", ""), "info")
         weight = SEVERITY_WEIGHTS.get(sev, 0.5)
         count  = r.get("count") or 0
-        impact += (count / total_rows) * weight
+        finding_total = r.get("total") or total_rows
+        if finding_total <= 0:
+            continue
+        impact += (count / finding_total) * weight
     return max(0, min(100, round(100 - impact * 100)))
 
 
