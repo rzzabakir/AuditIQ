@@ -5,7 +5,7 @@ import pandas as pd
 
 from engine.checks.base import (
     Category, Severity, CheckResult,
-    build_result, _sample,
+    build_result, _sample, _is_text,
 )
 
 _CAT = Category.COMPLETENESS
@@ -19,7 +19,7 @@ def missing_values(df: pd.DataFrame) -> list[CheckResult]:
     for col in df.columns:
         series = df[col]
         mask = series.isna()
-        if series.dtype == object:
+        if _is_text(series):
             non_null = series.dropna()
             if not non_null.empty:
                 ws_idx = non_null[non_null.astype(str).str.strip() == ""].index
@@ -51,8 +51,10 @@ def empty_rows(df: pd.DataFrame) -> list[CheckResult]:
     if total == 0:
         return []
     is_null = df.isna().copy()
-    for col in df.select_dtypes(include="object").columns:
-        is_null[col] |= df[col].astype(str).str.strip().eq("")
+    for col in df.columns:
+        if not _is_text(df[col]):
+            continue
+        is_null[col] |= df[col].astype(str).str.strip().eq("").fillna(False)
     mask = is_null.all(axis=1)
     count = int(mask.sum())
     if count == 0:

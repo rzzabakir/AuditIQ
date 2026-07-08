@@ -7,7 +7,7 @@ import pandas as pd
 
 from engine.checks.base import (
     Category, Severity, CheckResult,
-    build_result, _sample, _parse_dt_silent,
+    build_result, _sample, _parse_dt_silent, _is_text,
 )
 
 _CAT = Category.VALIDITY
@@ -30,7 +30,7 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def mixed_types(df: pd.DataFrame) -> list[CheckResult]:
-    """Object columns whose minority inferred type exceeds 5% of non-nulls."""
+    """Text columns whose minority inferred type exceeds 5% of non-nulls."""
     results: list[CheckResult] = []
     total = len(df)
     int_pat   = r"^-?\d+$"
@@ -39,7 +39,7 @@ def mixed_types(df: pd.DataFrame) -> list[CheckResult]:
 
     for col in df.columns:
         series = df[col]
-        if series.dtype != object:
+        if not _is_text(series):
             continue
         non_null = series.dropna()
         if non_null.empty:
@@ -158,7 +158,7 @@ def malformed_identifiers(df: pd.DataFrame) -> list[CheckResult]:
     for col in df.columns:
         col_str = str(col)
         series = df[col]
-        if series.dtype != object:
+        if not _is_text(series):
             continue
         non_null = series.dropna().astype(str).str.strip()
         non_null = non_null[non_null != ""]

@@ -3,7 +3,7 @@
 Import pattern inside check modules:
     from engine.checks.base import (
         Category, Severity, CheckResult,
-        build_result, _sample, _parse_dt_silent,
+        build_result, _sample, _parse_dt_silent, _is_text,
     )
 """
 from __future__ import annotations
@@ -108,6 +108,17 @@ def build_result(
 
 
 # ── Shared utilities ──────────────────────────────────────────
+
+def _is_text(series: pd.Series) -> bool:
+    """True for text columns across pandas versions.
+
+    pandas 2 stores strings as `object`; pandas 3 defaults to the new `str`
+    dtype, so a plain `dtype == object` gate silently skips every text column
+    there.
+    """
+    return pd.api.types.is_object_dtype(series) or pd.api.types.is_string_dtype(series)
+
+
 
 def _to_native(value: Any) -> Any:
     if value is None:

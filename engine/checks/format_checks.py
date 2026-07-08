@@ -7,7 +7,7 @@ import pandas as pd
 
 from engine.checks.base import (
     Category, Severity, CheckResult,
-    build_result, _sample, _parse_dt_silent,
+    build_result, _sample, _parse_dt_silent, _is_text,
 )
 
 _CAT = Category.FORMAT
@@ -29,7 +29,7 @@ def format_inconsistencies(df: pd.DataFrame) -> list[CheckResult]:
 
     for col in df.columns:
         series = df[col]
-        if series.dtype != object:
+        if not _is_text(series):
             continue
         non_null = series.dropna()
         if non_null.empty:
@@ -109,7 +109,9 @@ def casing_inconsistency(df: pd.DataFrame) -> list[CheckResult]:
     results: list[CheckResult] = []
     total = len(df)
 
-    for col in df.select_dtypes(include="object").columns:
+    for col in df.columns:
+        if not _is_text(df[col]):
+            continue
         series = df[col].dropna().astype(str)
         if series.empty:
             continue
@@ -154,7 +156,9 @@ def whitespace_issues(df: pd.DataFrame) -> list[CheckResult]:
     results: list[CheckResult] = []
     total = len(df)
 
-    for col in df.select_dtypes(include="object").columns:
+    for col in df.columns:
+        if not _is_text(df[col]):
+            continue
         series = df[col].dropna().astype(str)
         if series.empty:
             continue
