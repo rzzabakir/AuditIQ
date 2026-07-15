@@ -11,4 +11,5 @@ All notable changes to AuditIQ will be documented here.
 - Added optional Gemini-generated narrative with deterministic fallback.
 - Added sample Titanic dataset and unit tests.
 - Added sample Titanic PDF report for repository visitors.
+- Fixed multi-column findings showing the raw `__multi__` sentinel in the PDF summary table, narrative, and dashboard; they now display the involved column names (e.g. `customer_id + customer_name`).
 

@@ -12,6 +12,8 @@ from typing import Any
 import google.generativeai as genai
 from dotenv import load_dotenv
 
+from engine.checks.base import display_column
+
 logger = logging.getLogger(__name__)
 
 MODEL_ID = "gemini-2.5-flash-lite"
@@ -133,7 +135,7 @@ def _build_payload(
         if col == "__row__":
             dataset_level.append(finding)
         else:
-            by_column[col].append(finding)
+            by_column[display_column(r)].append(finding)
 
     return {
         "dataset": {

@@ -12,6 +12,7 @@ import streamlit as st
 
 from ai.narrator import generate_narrative
 from engine.aggregator import run_all_checks
+from engine.checks.base import display_column
 from engine.parser import load_file
 from engine.schema import load_schema
 from report.pdf_builder import CHECK_LABELS, generate_pdf
@@ -394,8 +395,14 @@ def _column_severity_map(checks: list[dict]) -> dict[str, str]:
         if not col or col == "__row__":
             continue
         sev = r.get("severity") or CHECK_SEVERITY.get(r.get("check", ""), "info")
-        if col not in worst or order[sev] > order[worst[col]]:
-            worst[col] = sev
+        # Multi-column findings contribute severity to each involved column.
+        if col == "__multi__":
+            cols = [str(c) for c in (r.get("columns") or [])]
+        else:
+            cols = [col]
+        for c in cols:
+            if c not in worst or order[sev] > order[worst[c]]:
+                worst[c] = sev
     return worst
 
 
@@ -407,6 +414,7 @@ def _top_affected(checks: list[dict], total_rows: int, limit: int = 5) -> list[d
         col = r.get("column", "")
         if not col or col == "__row__":
             continue
+        col = display_column(r)
         count = r.get("count") or 0
         pct = (count / total_rows) * 100
         if col not in by_col or pct > by_col[col]["pct"]:
@@ -449,6 +457,8 @@ def _next_steps_from_checks(checks: list[dict]) -> list[dict]:
         col = r.get("column", "the dataset")
         if col == "__row__":
             col = "the dataset"
+        elif col == "__multi__":
+            col = display_column(r)
         label = CHECK_LABELS.get(r.get("check", ""), r.get("check", "issue"))
         steps.append({
             "title": f"Address {label.lower()} in {col}",

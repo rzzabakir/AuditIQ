@@ -18,6 +18,8 @@ from reportlab.platypus import (
     Table, TableStyle,
 )
 
+from engine.checks.base import display_column
+
 logger = logging.getLogger(__name__)
 
 CHECK_LABELS: dict[str, str] = {
@@ -145,9 +147,7 @@ def _summary_section(check_results: list[dict[str, Any]]) -> list[Any]:
 
     data: list[list[str]] = [["Column Name", "Issue Type", "Affected Records", "% of Total"]]
     for r in non_zero:
-        col = r.get("column", "")
-        if col == "__row__":
-            col = "Dataset (all rows)"
+        col = display_column(r)
         issue = CHECK_LABELS.get(r.get("check", ""), r.get("check", "unknown"))
         count = r.get("count") or 0
         total = r.get("total") or 0

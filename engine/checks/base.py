@@ -109,6 +109,22 @@ def build_result(
 
 # ── Shared utilities ──────────────────────────────────────────
 
+def display_column(result: dict) -> str:
+    """Human-readable column label for a check result.
+
+    Resolves the `__row__` / `__multi__` sentinels so UI, PDF, and narrative
+    consumers never show them to end users.
+    """
+    col = str(result.get("column", "") or "")
+    if col == "__row__":
+        return "Dataset (all rows)"
+    if col == "__multi__":
+        cols = result.get("columns") or []
+        return " + ".join(str(c) for c in cols) if cols else "Multiple columns"
+    return col
+
+
+
 def _is_text(series: pd.Series) -> bool:
     """True for text columns across pandas versions.
 
